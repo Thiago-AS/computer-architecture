@@ -8,8 +8,6 @@
 
 int32_t mem[MEM_SIZE];
 
-int32_t breg[32];
-
 uint32_t PC, ri;
 
 int32_t	opcode,
