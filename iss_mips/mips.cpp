@@ -234,7 +234,7 @@ void Mips::Step() {
     Execute();
 }
 
-void run(){
+void run() {
     uint32_t cnt = 0;
     pc = 0;
     while(cnt < MEM_SIZE) {
@@ -244,7 +244,7 @@ void run(){
     }
 }
 
-void Mips::DumpReg(char format){
+void Mips::DumpReg(char format) {
     if(format == 'd'){
         std::cout << "Dump Registers: " << std::endl;
 
@@ -270,5 +270,15 @@ void Mips::DumpReg(char format){
         std::cout << "pc = " << std::hex <<  PC*4 << std::endl;
         std::cout << "hi = " << std::hex << hi << std::endl;
         std::cout << "lo = " << std::hex << lo << std::endl;
+    }
+}
+
+void Mips::DumpMem(uint32_t start, uint32_t end, char format) {
+    std::cout << "Dump Memory: " << std::endl;
+    for(uint32_t i = start; i <= end; i++){
+        if(format == 'd')
+            std::cout << "Address [" << std::hex << i*4 << "] = " << mem[i] << std::endl;
+        else
+            std::cout << "Address [" << std::hex << i*4 << "] = " << std::hex << mem[i] << std::endl;
     }
 }
