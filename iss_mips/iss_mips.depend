@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1537116312 source:c:\users\thiag\desktop\git\computerarchitecture\iss_mips\mips.cpp
+	"mips.hpp"
+
+1537116946 c:\users\thiag\desktop\git\computerarchitecture\iss_mips\mips.hpp
+	<cstdint>
+	<iostream>
+	<cstdlib>
+	<string>
+
+1537116059 c:\users\thiag\desktop\git\computerarchitecture\iss_mips\globals.hpp
+	<cstdint>
+	<iostream>
+	<cstdlib>
+	<string>
+
+1537116287 source:c:\users\thiag\desktop\git\computerarchitecture\iss_mips\main.cpp
+	"mips.hpp"
+

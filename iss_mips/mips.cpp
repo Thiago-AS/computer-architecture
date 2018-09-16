@@ -1,5 +1,17 @@
 #include "mips.hpp"
 
+int32_t mem[MEM_SIZE];
+
+uint32_t PC, ri, k26;
+
+uint32_t opcode,
+                rs,
+                rt,
+                rd,
+                shamt,
+                funct;
+
+int32_t k16, hi, lo;
 
 int32_t Mips::lw(uint32_t address, int16_t kte){
     if((address+kte) % 4 != 0){
@@ -154,7 +166,7 @@ void Mips::Execute() {
             break;
 
         case JR:
-            pc = reg[rs];
+            PC = reg[rs];
             break;
 
         case SLL:
@@ -175,12 +187,12 @@ void Mips::Execute() {
                 std::cout << reg[A0] << std::endl;
                 break;
 
-            case 4:
-                uint32_t address = reg[A0]/4;
+            case 4:{
+                uint32_t addr = reg[A0]/4;
 
                 char *caracter;
 
-                caracter = (char *)&(mem[endereco]);
+                caracter = (char *)&(mem[addr]);
 
                 caracter += reg[4] % 4;
                 do{
@@ -188,10 +200,11 @@ void Mips::Execute() {
                     caracter++;
                 }while(*caracter != '\0');
                 break;
+            }
 
             case 10:
                 std::cout << "Program finished running" << std::endl;
-                DumpReg();
+                DumpReg('h');
                 exit(EXIT_SUCCESS);
                 break;
 
@@ -257,25 +270,25 @@ void Mips::Execute() {
 
     case BEQ:
         if(reg[rs] == reg[rt]) {
-            pc = pc + k16;
+            PC = PC + k16;
         }
         break;
 
     case BNE:
         if(reg[rs] != reg[rt]) {
-            pc = pc + k16;
+            PC = PC + k16;
         }
         break;
 
     case BLEZ:
         if(reg[rs] <= 0) {
-            pc = pc + k16;
+            PC = PC + k16;
         }
         break;
 
     case BGTZ:
         if(reg[rs] > 0){
-            pc = pc + k16;
+            PC = PC + k16;
         }
         break;
 
@@ -288,7 +301,7 @@ void Mips::Execute() {
         break;
 
     case SLTIU:
-        reg[rt] = (reg[rs] < (uint32_t)k16) ? 1 : 0;
+        reg[rt] = ((uint32_t)reg[rs] < (uint32_t)k16) ? 1 : 0;
         break;
 
     case ANDI:
@@ -308,12 +321,12 @@ void Mips::Execute() {
         break;
 
     case J:
-        pc = k26;
+        PC = k26;
         break;
 
     case JAL:
-        reg[RA] = pc;
-        pc = k26;
+        reg[RA] = PC;
+        PC = k26;
         break;
 
     default:
@@ -322,17 +335,17 @@ void Mips::Execute() {
 }
 
 void Mips::Step() {
-    Fetch(pc);
+    Fetch(PC);
     Decode();
     Execute();
 }
 
-void run() {
+void Mips::Run() {
     uint32_t cnt = 0;
-    pc = 0;
+    PC = 0;
     while(cnt < MEM_SIZE) {
         reg[ZERO] = 0;
-        step();
+        Step();
         cnt++;
     }
 }

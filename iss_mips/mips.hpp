@@ -1,7 +1,25 @@
 #ifndef MIPS_HPP
 #define MIPS_HPP
 
-#include "globals.hpp"
+#include <cstdint>
+#include <iostream>
+#include <cstdlib>
+#include <string>
+
+#define MEM_SIZE 4096
+
+extern int32_t mem[MEM_SIZE];
+
+extern uint32_t PC, ri, k26;
+
+extern uint32_t opcode,
+                rs,
+                rt,
+                rd,
+                shamt,
+                funct;
+
+extern int32_t k16, hi, lo;
 
 class Mips {
  private:
@@ -11,7 +29,7 @@ class Mips {
         SB=0x28, SH=0x29, BEQ=0x04, BNE=0x05,
         BLEZ=0x06, BGTZ=0x07, ADDI=0x08, SLTI=0x0A,
         SLTIU=0x0B, ANDI=0x0C, ORI=0x0D, XORI=0x0E,
-        J=0x02, JAL=0x03, ADDiu=0x09
+        J=0x02, JAL=0x03, ADDIU=0x09
     };
 
     enum FUNCT {
@@ -47,14 +65,11 @@ class Mips {
     void sh(uint32_t address, int16_t kte, int16_t dado);
     void sb(uint32_t address, int16_t kte, int8_t dado);
 
-
  public:
 	void Step();
 	void Run();
     void DumpMem(uint32_t address, uint32_t size, char format);
 	void DumpReg(char format);
-
-
 };
 
 #endif
