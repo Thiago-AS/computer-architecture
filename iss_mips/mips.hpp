@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include <iomanip>
 
 #define MEM_SIZE 4096
 
@@ -23,6 +24,15 @@ extern int32_t k16, hi, lo;
 
 class Mips {
  private:
+    int32_t lw(uint32_t address, int16_t kte);
+    int32_t lh(uint32_t address, int16_t kte);
+    uint32_t lhu(uint32_t address, int16_t kte);
+    int32_t lb(uint32_t address, int16_t kte);
+    uint32_t lbu(uint32_t address, int16_t kte);
+    void sw(uint32_t address, int16_t kte, int32_t dado);
+    void sh(uint32_t address, int16_t kte, int16_t dado);
+    void sb(uint32_t address, int16_t kte, int8_t dado);
+
     enum OPCODES {
         EXT=0x00, LW=0x23, LB=0x20, LBU=0x24,
         LH=0x21, LHU=0x25, LUI=0x0F, SW=0x2B,
@@ -54,14 +64,7 @@ class Mips {
     void Fetch(uint32_t PC);
 	void Decode();
 	void Execute();
-	int32_t lw(uint32_t address, int16_t kte);
-    int32_t lh(uint32_t address, int16_t kte);
-    uint32_t lhu(uint32_t address, int16_t kte);
-    int32_t lb(uint32_t address, int16_t kte);
-    uint32_t lbu(uint32_t address, int16_t kte);
-    void sw(uint32_t address, int16_t kte, int32_t dado);
-    void sh(uint32_t address, int16_t kte, int16_t dado);
-    void sb(uint32_t address, int16_t kte, int8_t dado);
+
 
  public:
 	int32_t reg[32];

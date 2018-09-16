@@ -4,12 +4,7 @@ int32_t mem[MEM_SIZE];
 
 uint32_t PC, ri, k26;
 
-uint32_t opcode,
-                rs,
-                rt,
-                rd,
-                shamt,
-                funct;
+uint32_t opcode, rs, rt, rd, shamt, funct;
 
 int32_t k16, hi, lo;
 
@@ -105,9 +100,11 @@ void Mips::sb(uint32_t address, int16_t kte, int8_t dado){
     mem[(address+kte)/4] = (data & mask) | (base_address & (~mask));
 }
 
-void Mips::Fetch(uint32_t PC) {
-    ri = mem[PC];
-    PC++;
+void Mips::Fetch(uint32_t pc_address) {
+    ri = mem[pc_address];
+    //std::cout << "RI: " << std::hex << ri << " PC: " << PC*4 << std::endl;
+    //DumpReg('x');
+    PC = pc_address + 1;
 }
 
 void Mips::Decode() {
@@ -117,7 +114,7 @@ void Mips::Decode() {
     rd = (ri << 16) >> 27;
     shamt = (ri << 21) >> 27;
     funct = ri & 0x3F;
-    k16 = (ri << 16) >> 16;
+    k16 = (int32_t(ri) << 16) >> 16;
     k26 = (ri << 6 ) >> 6;
 }
 
@@ -184,17 +181,15 @@ void Mips::Execute() {
         case SYSCALL:
             switch(reg[V0]) {
             case 1:
-                std::cout << reg[A0] << std::endl;
+                std::cout << reg[A0];
                 break;
 
             case 4:{
                 uint32_t addr = reg[A0]/4;
-
                 char *caracter;
-
                 caracter = (char *)&(mem[addr]);
-
                 caracter += reg[4] % 4;
+
                 do{
                     printf("%c", *caracter);
                     caracter++;
@@ -203,7 +198,7 @@ void Mips::Execute() {
             }
 
             case 10:
-                std::cout << "Program finished running" << std::endl;
+                std::cout << "\n-- program is finished running --" << std::endl;
                 DumpReg('h');
                 exit(EXIT_SUCCESS);
                 break;
@@ -356,35 +351,36 @@ void Mips::DumpReg(char format) {
 
         for(int i = 0; i < 32; i++){
             if(i == 31)
-                std::cout << "reg[" << i << "] = " << reg[i]*4 << std::endl;
+                std::cout << "reg[" << std::dec << i << "] = " << std::dec << reg[i]*4 << std::endl;
             else
-                std::cout << "reg[" << i << "] = " << reg[i] << std::endl;
+                std::cout << "reg[" << std::dec << i << "] = " << std::dec << reg[i] << std::endl;
         }
-        std::cout << "pc = " << PC*4 << std::endl;
-        std::cout << "hi = " << hi << std::endl;
-        std::cout << "lo = " << lo << std::endl;
+        std::cout << "pc = " << std::dec << PC*4 << std::endl;
+        std::cout << "hi = " << std::dec << hi << std::endl;
+        std::cout << "lo = " << std::dec << lo << std::endl;
     }
-    else{
+    else {
         std::cout << "Dump Registers: " << std::endl;
 
         for(int i = 0; i < 32; i++){
             if(i == 31)
-                std::cout << "reg[" << i << "] = " << std::hex << reg[i]*4 << std::endl;
+                std::cout << "reg[" << std::dec << i << "] = " << std::setfill('0') << std::setw(8) << std::hex << reg[i]*4 << std::endl;
             else
-                std::cout << "reg[" << i << "] = " << std::hex << reg[i] << std::endl;
+                std::cout << "reg[" << std::dec << i << "] = " << std::setfill('0') << std::setw(8) << std::hex << reg[i] << std::endl;
         }
-        std::cout << "pc = " << std::hex <<  PC*4 << std::endl;
-        std::cout << "hi = " << std::hex << hi << std::endl;
-        std::cout << "lo = " << std::hex << lo << std::endl;
+        std::cout << "pc = " << std::setfill('0') << std::setw(8) << std::hex <<  PC*4 << std::endl;
+        std::cout << "hi = " << std::setfill('0') << std::setw(8) << std::hex << hi << std::endl;
+        std::cout << "lo = " << std::setfill('0') << std::setw(8) << std::hex << lo << std::endl;
     }
 }
 
 void Mips::DumpMem(uint32_t start, uint32_t end, char format) {
     std::cout << "Dump Memory: " << std::endl;
-    for(uint32_t i = start; i <= end; i++){
+    for(uint32_t i = start/4; i <= end/4; i++){
         if(format == 'd')
-            std::cout << "Address [" << std::hex << i*4 << "] = " << mem[i] << std::endl;
+            std::cout << "Address [" << std::hex << i*4 << "] = " << std::dec << mem[i] << std::endl;
         else
-            std::cout << "Address [" << std::hex << i*4 << "] = " << std::hex << mem[i] << std::endl;
+            std::cout << "Address [" << std::hex << std::setw(4) << i*4 << "] = " << std::setfill('0') << std::setw(8) << std::hex << mem[i] << std::endl;
     }
+
 }
