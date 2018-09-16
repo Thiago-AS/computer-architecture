@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include <iostream>
+#include <cstdlib>
+#include <string>
 
 #define MEM_SIZE 4096
 
