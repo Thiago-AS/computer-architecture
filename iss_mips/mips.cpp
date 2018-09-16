@@ -1,5 +1,7 @@
 #include "mips.hpp"
 
+bool end_of_prog;
+
 int32_t mem[MEM_SIZE];
 
 uint32_t PC, ri, k26;
@@ -181,7 +183,7 @@ void Mips::Execute() {
         case SYSCALL:
             switch(reg[V0]) {
             case 1:
-                std::cout << reg[A0];
+                std::cout << std::dec << reg[A0];
                 break;
 
             case 4:{
@@ -191,7 +193,7 @@ void Mips::Execute() {
                 caracter += reg[4] % 4;
 
                 do{
-                    printf("%c", *caracter);
+                    std::cout << *caracter;
                     caracter++;
                 }while(*caracter != '\0');
                 break;
@@ -199,8 +201,7 @@ void Mips::Execute() {
 
             case 10:
                 std::cout << "\n-- program is finished running --" << std::endl;
-                DumpReg('h');
-                exit(EXIT_SUCCESS);
+                end_of_prog = true;
                 break;
 
             default:
@@ -338,11 +339,14 @@ void Mips::Step() {
 void Mips::Run() {
     uint32_t cnt = 0;
     PC = 0;
-    while(cnt < MEM_SIZE) {
+    end_of_prog = false;
+    while(!end_of_prog || (cnt < MEM_SIZE/2)) {
         reg[ZERO] = 0;
         Step();
         cnt++;
     }
+    reg[ZERO] = 0;
+    PC = 0;
 }
 
 void Mips::DumpReg(char format) {

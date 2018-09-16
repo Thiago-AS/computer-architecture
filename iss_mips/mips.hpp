@@ -13,6 +13,8 @@ extern int32_t mem[MEM_SIZE];
 
 extern uint32_t PC, ri, k26;
 
+extern bool end_of_prog;
+
 extern uint32_t opcode,
                 rs,
                 rt,
