@@ -32,9 +32,9 @@ class Mips {
         GP = 28, SP = 29, FP = 30, RA = 31
 	};
 
-	int32_t breg[32];
+	int32_t reg[32];
 
-    void Fetch();
+    void Fetch(uint32_t PC);
 	void Decode();
 	void Execute();
 	void Step();

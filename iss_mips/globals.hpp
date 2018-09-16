@@ -8,7 +8,7 @@
 
 int32_t mem[MEM_SIZE];
 
-uint32_t PC, ri;
+uint32_t PC, ri, k26;
 
 int32_t	opcode,
 		rs,
@@ -16,8 +16,8 @@ int32_t	opcode,
 		rd,
 		shamnt,
 		funct,
-		k16;
-
-uint32_t k26;
+		k16,
+		hi,
+		lo;
 
 #endif
