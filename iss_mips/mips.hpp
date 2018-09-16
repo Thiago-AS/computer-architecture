@@ -51,8 +51,6 @@ class Mips {
         GP = 28, SP = 29, FP = 30, RA = 31
 	};
 
-	int32_t reg[32];
-
     void Fetch(uint32_t PC);
 	void Decode();
 	void Execute();
@@ -66,6 +64,7 @@ class Mips {
     void sb(uint32_t address, int16_t kte, int8_t dado);
 
  public:
+	int32_t reg[32];
 	void Step();
 	void Run();
     void DumpMem(uint32_t address, uint32_t size, char format);
