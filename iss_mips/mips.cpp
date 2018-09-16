@@ -115,11 +115,11 @@ void Mips::Execute() {
             break;
 
         case ADDU:
-            reg[rd] = reg[rs] + reg[rt];
+            reg[rd] = (uint32_t)reg[rs] + (uint32_t)reg[rt];
             break;
 
         case SLTU:
-            reg[rd] = (reg[rs] < reg[rt]) ? 1 : 0;
+            reg[rd] = ((uint32_t)reg[rs] < (uint32_t)reg[rt]) ? 1 : 0;
             break;
 
         default:
@@ -225,5 +225,50 @@ void Mips::Execute() {
 
     default:
         break;
+    }
+}
+
+void Mips::Step() {
+    Fetch(pc);
+    Decode();
+    Execute();
+}
+
+void run(){
+    uint32_t cnt = 0;
+    pc = 0;
+    while(cnt < MEM_SIZE) {
+        reg[ZERO] = 0;
+        step();
+        cnt++;
+    }
+}
+
+void Mips::DumpReg(char format){
+    if(format == 'd'){
+        std::cout << "Dump Registers: " << std::endl;
+
+        for(int i = 0; i < 32; i++){
+            if(i == 31)
+                std::cout << "reg[" << i << "] = " << reg[i]*4 << std::endl;
+            else
+                std::cout << "reg[" << i << "] = " << reg[i] << std::endl;
+        }
+        std::cout << "pc = " << PC*4 << std::endl;
+        std::cout << "hi = " << hi << std::endl;
+        std::cout << "lo = " << lo << std::endl;
+    }
+    else{
+        std::cout << "Dump Registers: " << std::endl;
+
+        for(int i = 0; i < 32; i++){
+            if(i == 31)
+                std::cout << "reg[" << i << "] = " << std::hex << reg[i]*4 << std::endl;
+            else
+                std::cout << "reg[" << i << "] = " << std::hex << reg[i] << std::endl;
+        }
+        std::cout << "pc = " << std::hex <<  PC*4 << std::endl;
+        std::cout << "hi = " << std::hex << hi << std::endl;
+        std::cout << "lo = " << std::hex << lo << std::endl;
     }
 }

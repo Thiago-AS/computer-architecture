@@ -40,7 +40,7 @@ class Mips {
 	void Step();
 	void Run();
 	void DumpMem();
-	void DumpReg();
+	void DumpReg(char format);
 
 
 };
