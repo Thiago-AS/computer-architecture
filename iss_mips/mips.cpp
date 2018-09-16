@@ -1,5 +1,98 @@
 #include "mips.hpp"
 
+
+int32_t Mips::lw(uint32_t address, int16_t kte){
+    if((address+kte) % 4 != 0){
+        std::cout << "Address not aligned!" << std::endl;
+        return 0;
+    }
+    return mem[(address+kte)/4];
+}
+
+int32_t Mips::lh(uint32_t address, int16_t kte){
+    int off_set;
+    int32_t base_address;
+
+    if((address+kte) % 2 != 0){
+        std::cout << "Address not aligned!" << std::endl;
+        return 0;
+    }
+
+    off_set = (address+kte) % 4;
+    base_address = mem[(address+kte)/4];
+    base_address = (base_address << (8 * (2-off_set))) >> 16;
+
+    return base_address;
+}
+
+uint32_t Mips::lhu(uint32_t address, int16_t kte){
+    int off_set;
+    uint32_t base_address;
+
+    if((address+kte) % 2 != 0){
+        std::cout << "Address not aligned!" << std::endl;
+        return 0;
+    }
+
+    off_set = (address+kte) % 4;
+    base_address = mem[(address+kte)/4];
+    base_address = (base_address << (8 * (2-off_set))) >> 16;
+
+    return base_address;
+}
+
+int32_t Mips::lb(uint32_t address, int16_t kte){
+    int off_set;
+    int32_t base_address;
+    off_set = (address+kte) % 4;
+    base_address = mem[(address+kte)/4];
+    base_address = (base_address << (8 * (3-off_set))) >> 24;
+
+    return base_address;
+}
+
+uint32_t Mips::lbu(uint32_t address, int16_t kte){
+    int off_set;
+    uint32_t base_address;
+    off_set = (address+kte) % 4;
+    base_address = mem[(address+kte)/4];
+    base_address = (base_address << (8 * (3-off_set))) >> 24;
+
+    return base_address;
+}
+
+void Mips::sw(uint32_t address, int16_t kte, int32_t dado){
+    if((address+kte) % 4 != 0)
+        std::cout << "Address not aligned!" << std::endl;
+    else
+        mem[(address+kte)/4] = dado;
+}
+
+void Mips::sh(uint32_t address, int16_t kte, int16_t dado){
+    int off_set;
+    int32_t data, base_address, mask;
+
+    if((address+kte) % 2 != 0)
+        std::cout << "Address not aligned!" << std::endl;
+    else{
+        off_set = (address+kte) % 4;
+        base_address = mem[(address+kte)/4];
+        data = dado << (8 * off_set);
+        mask = 0xffff << (8 * off_set);
+        mem[(address+kte)/4] = (data & mask) | (base_address & (~mask));
+    }
+}
+
+void Mips::sb(uint32_t address, int16_t kte, int8_t dado){
+    int off_set;
+    int32_t base_address, data, mask;
+    off_set = (address+kte) % 4;
+    base_address = mem[(address+kte)/4];
+    data = dado << (8 * off_set);
+    mask = 0xff << (8 * off_set);
+    mem[(address+kte)/4] = (data & mask) | (base_address & (~mask));
+}
+
 void Mips::Fetch(uint32_t PC) {
     ri = mem[PC];
     PC++;
