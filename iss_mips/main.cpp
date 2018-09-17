@@ -1,9 +1,5 @@
 #include "mips.hpp"
 
-void menu (){
-
-}
-
 void LoadData(FILE *file) {
     uint32_t address = 2048;
 

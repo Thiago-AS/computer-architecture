@@ -104,9 +104,8 @@ void Mips::sb(uint32_t address, int16_t kte, int8_t dado){
 
 void Mips::Fetch(uint32_t pc_address) {
     ri = mem[pc_address];
-    //std::cout << "RI: " << std::hex << ri << " PC: " << PC*4 << std::endl;
-    //DumpReg('x');
     PC = pc_address + 1;
+
 }
 
 void Mips::Decode() {
@@ -118,6 +117,10 @@ void Mips::Decode() {
     funct = ri & 0x3F;
     k16 = (int32_t(ri) << 16) >> 16;
     k26 = (ri << 6 ) >> 6;
+
+    // DEBUG LINE - SHOW STEP BY STEP
+    //std::cout << "ri: " << std::hex << ri << " pc: " << PC << " opcode: " << opcode << " rs: " << rs << " rt: " << rt << " rd: " <<std::dec << rd << " shamt: " << shamt << " funct: " << funct << " k16: " << k16 << " k26: " << k26 << std::endl;
+
 }
 
 void Mips::Execute() {
@@ -169,7 +172,7 @@ void Mips::Execute() {
             break;
 
         case SLL:
-            reg[rd] = reg[rt] << shamt;
+            reg[rd] = (uint32_t)reg[rt] << shamt;
             break;
 
         case SRL:
@@ -200,13 +203,14 @@ void Mips::Execute() {
             }
 
             case 10:
-                std::cout << "\n-- program is finished running --" << std::endl;
+                std::cout << "\n\n-- program is finished running --" << std::endl;
                 end_of_prog = true;
                 break;
 
             default:
                 break;
             }
+            break;
 
         case MFHI:
             reg[rd] = hi;
@@ -227,6 +231,7 @@ void Mips::Execute() {
         default:
             break;
         }
+        break;
 
     case LW:
         reg[rt] = lw(reg[rs], k16);
@@ -301,7 +306,7 @@ void Mips::Execute() {
         break;
 
     case ANDI:
-        reg[rd] = reg[rs] & k16;
+        reg[rt] = reg[rs] & k16;
         break;
 
     case ORI:
@@ -340,13 +345,17 @@ void Mips::Run() {
     uint32_t cnt = 0;
     PC = 0;
     end_of_prog = false;
-    while(!end_of_prog || (cnt < MEM_SIZE/2)) {
+    while(cnt < MEM_SIZE/2) {
         reg[ZERO] = 0;
         Step();
         cnt++;
+        if(end_of_prog)
+            break;
     }
     reg[ZERO] = 0;
     PC = 0;
+    std::cout << std::endl;
+    DumpReg('h');
 }
 
 void Mips::DumpReg(char format) {
@@ -372,7 +381,7 @@ void Mips::DumpReg(char format) {
             else
                 std::cout << "reg[" << std::dec << i << "] = " << std::setfill('0') << std::setw(8) << std::hex << reg[i] << std::endl;
         }
-        std::cout << "pc = " << std::setfill('0') << std::setw(8) << std::hex <<  PC*4 << std::endl;
+        std::cout << "pc = " << std::setfill('0') << std::setw(8) << std::hex <<  PC << std::endl;
         std::cout << "hi = " << std::setfill('0') << std::setw(8) << std::hex << hi << std::endl;
         std::cout << "lo = " << std::setfill('0') << std::setw(8) << std::hex << lo << std::endl;
     }
