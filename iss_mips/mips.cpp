@@ -137,9 +137,9 @@ void Mips::Execute() {
 
         case MULT:
             int64_t temp;
-            temp = reg[rs] * reg[rt];
-            hi = (temp & 0x1111111100000000) >> 32;
-            lo = temp & 0x0000000011111111;
+            temp = (int64_t)reg[rs] * (int64_t)reg[rt];
+            hi = (temp & 0xFFFFFFFF00000000) >> 32;
+            lo = temp & 0x00000000FFFFFFFF;
             break;
 
         case DIV:
@@ -160,7 +160,7 @@ void Mips::Execute() {
             break;
 
         case NOR:
-            reg[rd] = ~(reg[rs] ^ reg[rt]);
+            reg[rd] = ~(reg[rs] | reg[rt]);
             break;
 
         case SLT:
@@ -310,7 +310,7 @@ void Mips::Execute() {
         break;
 
     case ORI:
-        reg[rt] = reg[rs] | k16;
+        reg[rt] = reg[rs] | (uint16_t)k16;
         break;
 
     case XORI:
