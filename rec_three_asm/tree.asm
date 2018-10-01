@@ -7,7 +7,9 @@
 	exit_text: .asciiz "[4] - Exit program\n"
 	
 .text
-
+	la $s5, ($gp)
+	jal print_menu
+	
 print_menu:
 	addi $s2, $s2, 0
 	
@@ -45,19 +47,17 @@ user_input:
 	j user_input         
 
 insert_value:
-	la $s0, ($gp)        # s0 = root address
+	la $s0, ($s5)        # s0 = root address
 	li $v0, 5
 	syscall
 	
 	move $s1, $v0
 
 recursion:
-	addi $sp, $sp, -16
+	addi $sp, $sp, -12
 	sw $s0, 0($sp)
-	sw $gp, 4($sp)
+	sw $s3, 4($sp)
 	sw $ra, 8($sp) 
-	sw $s3, 12($sp)
-	
 
 	beqz $s2, create_node
 	
@@ -74,11 +74,12 @@ create_node:
 	sw $t1, 8($gp)
 	
 	lw $s0, 0($sp)
-	lw $gp, 4($sp)
+	lw $s3, 4($sp)
 	lw $ra, 8($sp) 
-	lw $s3, 12($sp)
-	addi $sp, $sp, 16
+	addi $sp, $sp, 12
 	add $s2, $s2, 1
+	addi $gp, $gp, 12
+	addi $s0, $gp, -12
 	jr $ra
 	
 rec_left:
@@ -90,15 +91,12 @@ rec_left:
 	addi $s2, $zero, 0
 	
 l1:
-	addi $gp, $gp, 12
 	jal recursion
-	
-	sw $gp, 4($s3)
+	sw $s0, 4($s3)
 	lw $s0, 0($sp)
-	lw $gp, 4($sp)
+	lw $s3, 4($sp)
 	lw $ra, 8($sp) 
-	lw $s3, 12($sp)
-	addi $sp, $sp, 16
+	addi $sp, $sp, 12
 	jr $ra
 	
 	
@@ -111,15 +109,12 @@ rec_right:
 	addi $s2, $zero, 0
 	
 l2:
-	addi $gp, $gp, 12
 	jal recursion
-	
-	sw $gp, 8($s3)
+	sw $s0, 8($s3)
 	lw $s0, 0($sp)
-	lw $gp, 4($sp)
+	lw $s3, 4($sp)
 	lw $ra, 8($sp) 
-	lw $s3, 12($sp)
-	addi $sp, $sp, 16
+	addi $sp, $sp, 12
 	jr $ra
 
 exit: 
