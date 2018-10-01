@@ -1,10 +1,12 @@
 .data
 	new_line: .asciiz "\n"
-	menu_question: .asciiz "\nSelect one of the options: \n "
+	menu_question: .asciiz "\nSelect one of the options:\n"
 	insert_text: .asciiz "[1] - Insert a value to the tree\n"
 	search_text: .asciiz "[2] - Search a value in the tree\n"
 	size_text: .asciiz "[3] - Get tree size\n"
 	exit_text: .asciiz "[4] - Exit program\n"
+	value_text: .asciiz "\nThe value "
+	address_text: .asciiz  " is located at the address: "
 	
 .text
 	la $s5, ($gp)
@@ -38,6 +40,7 @@ user_input:
 	syscall
 	
 	beq $v0, 1, insert_value     
+	beq $v0, 2, search_value
 	beq $v0, 4, exit      
 
 	li $v0, 4           
@@ -45,6 +48,8 @@ user_input:
 	syscall
 	
 	j user_input         
+	
+############################################### INSERE_REC #################################################
 
 insert_value:
 	la $s0, ($s5)        # s0 = root address
@@ -117,6 +122,77 @@ l2:
 	addi $sp, $sp, 12
 	jr $ra
 
+############################################### END INSERE_REC #############################################
+
+
+############################################### BUSCA_REC ##################################################
+search_value:
+	la $s0, ($s5)        # s0 = root address
+	li $v0, 5
+	syscall
+	
+	move $s1, $v0 	     # s1 = value
+	
+
+search_rec:
+	addi $sp, $sp, -12
+	sw $s0, 0($sp)
+	sw $s3, 4($sp)
+	sw $ra, 8($sp) 
+	
+	lw $t0, 0($s0)
+	beqz $t0, error
+	beq $s1, $t0, print_values
+	
+	blt $s1, $t0, search_left
+	bgt $s1, $t0, search_right
+	
+	jr $ra
+	
+search_left:
+	lw $s0, 4($s0)
+	bnez  $s0, l3
+	lw $s0, 0($sp)	
+l3:	
+	j search_rec
+	
+	
+search_right:
+	lw $s0, 8($s0)
+	bnez  $s0, l4
+	lw $s0, 0($sp)
+l4:	
+	j search_rec
+	
+
+	
+error:
+	jr $ra
+
+print_values:
+	li $v0, 4
+	la $a0, value_text
+	syscall
+	
+	li $v0, 34
+	addi $a0, $s1, 0 
+	syscall
+	
+	li $v0, 4
+	la $a0, address_text 
+	syscall
+	
+	li $v0, 34
+	addi $a0, $s0, 0 
+	syscall
+	
+	li $v0, 4           
+	la $a0, new_line          
+	syscall
+	
+	jr $ra
+
+############################################### END BUSCA_REC ##############################################
 exit: 
 	li $v0, 10          #Terminate Program
 	syscall
