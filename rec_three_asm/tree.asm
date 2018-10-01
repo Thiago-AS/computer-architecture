@@ -200,6 +200,7 @@ print_values:
 tree_size:
 	addi $s7, $zero, 0
 	addi $s3, $s0, 0
+	addi $fp, $sp, -12
 tree_rec:
 	addi $sp, $sp, -12
 	sw $s0, 0($sp)
@@ -208,8 +209,11 @@ tree_rec:
 	
 	lw $t0, 0($s3)
 	beqz $t0, ret_zero
-	b get_size
+	jal get_size_left
+	addi $s7, $s7, 1
+	jal get_size_right
 	
+	b print_size
 	
 ret_zero:
 	lw $s0, 0($sp)
@@ -218,7 +222,12 @@ ret_zero:
 	addi $sp, $sp, 12
 	jr $ra
 
-get_size:
+get_size_left:
+	addi $sp, $sp, -12
+	sw $s0, 0($sp)
+	sw $s3, 4($sp)
+	sw $ra, 8($sp) 
+	
 	lw $s0, 4($s0)	# root->left
 	addi $s3, $s0, 0 
 	bnez  $s0, l5 #se root->left = 0
@@ -226,9 +235,19 @@ get_size:
 	addi $s3, $s0, 4
 l5:	
 	jal tree_rec
-	
-	addi $s7, $s7, 1
 
+	lw $s0, 0($sp)
+	lw $s3, 4($sp)
+	lw $ra, 8($sp) 
+	addi $sp, $sp, 12
+	jr $ra
+
+get_size_right:
+	addi $sp, $sp, -12
+	sw $s0, 0($sp)
+	sw $s3, 4($sp)
+	sw $ra, 8($sp) 
+	
 	lw $s0, 8($s0)
 	addi $s3, $s0, 0
 	bnez  $s0, l6
@@ -237,7 +256,6 @@ l5:
 l6:	
 	jal tree_rec
 	
-	j print_size
 	lw $s0, 0($sp)
 	lw $s3, 4($sp)
 	lw $ra, 8($sp) 
@@ -245,6 +263,7 @@ l6:
 	jr $ra
 
 print_size:
+	bne $fp, $sp, continue_get_size
 	li $v0, 4
 	la $a0, size_reponse_text
 	syscall
@@ -256,7 +275,8 @@ print_size:
 	li $v0, 4
 	la $a0, size_reponse_text1
 	syscall
-	
+
+continue_get_size:
 	lw $s0, 0($sp)
 	lw $s3, 4($sp)
 	lw $ra, 8($sp) 
