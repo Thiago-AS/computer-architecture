@@ -7,7 +7,8 @@
 	exit_text: .asciiz "[4] - Exit program\n"
 	value_text: .asciiz "\nThe value "
 	address_text: .asciiz  " is located at the address: "
-	
+	size_reponse_text: .asciiz "There is "
+	size_reponse_text1: .asciiz " nodes in the tree.\n"
 .text
 	la $s5, ($gp)
 	jal print_menu
@@ -41,6 +42,7 @@ user_input:
 	
 	beq $v0, 1, insert_value     
 	beq $v0, 2, search_value
+	beq $v0, 3, tree_size
 	beq $v0, 4, exit      
 
 	li $v0, 4           
@@ -193,6 +195,75 @@ print_values:
 	jr $ra
 
 ############################################### END BUSCA_REC ##############################################
+
+############################################### SIZE_REC ###################################################
+tree_size:
+	addi $s7, $zero, 0
+	addi $s3, $s0, 0
+tree_rec:
+	addi $sp, $sp, -12
+	sw $s0, 0($sp)
+	sw $s3, 4($sp)
+	sw $ra, 8($sp) 
+	
+	lw $t0, 0($s3)
+	beqz $t0, ret_zero
+	b get_size
+	
+	
+ret_zero:
+	lw $s0, 0($sp)
+	lw $s3, 4($sp)
+	lw $ra, 8($sp) 
+	addi $sp, $sp, 12
+	jr $ra
+
+get_size:
+	lw $s0, 4($s0)	# root->left
+	addi $s3, $s0, 0 
+	bnez  $s0, l5 #se root->left = 0
+	lw $s0, 0($sp) 
+	addi $s3, $s0, 4
+l5:	
+	jal tree_rec
+	
+	addi $s7, $s7, 1
+
+	lw $s0, 8($s0)
+	addi $s3, $s0, 0
+	bnez  $s0, l6
+	lw $s0, 0($sp)
+	addi $s3, $s0, 8
+l6:	
+	jal tree_rec
+	
+	j print_size
+	lw $s0, 0($sp)
+	lw $s3, 4($sp)
+	lw $ra, 8($sp) 
+	addi $sp, $sp, 12
+	jr $ra
+
+print_size:
+	li $v0, 4
+	la $a0, size_reponse_text
+	syscall
+	
+	li $v0, 1
+	addi $a0, $s7, 0
+	syscall
+		
+	li $v0, 4
+	la $a0, size_reponse_text1
+	syscall
+	
+	lw $s0, 0($sp)
+	lw $s3, 4($sp)
+	lw $ra, 8($sp) 
+	addi $sp, $sp, 12
+	jr $ra
+	
+############################################### SIZE_REC ###################################################
 exit: 
 	li $v0, 10          #Terminate Program
 	syscall
