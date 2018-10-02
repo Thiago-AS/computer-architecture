@@ -135,6 +135,10 @@ search_value:
 	
 	move $s1, $v0 	     # s1 = value
 	
+	addi $s7, $zero, 0 #return variable
+	la $s0, ($s5)
+	addi $s3, $s0, 0
+	addi $fp, $sp, -12
 
 search_rec:
 	addi $sp, $sp, -12
@@ -142,36 +146,51 @@ search_rec:
 	sw $s3, 4($sp)
 	sw $ra, 8($sp) 
 	
-	lw $t0, 0($s0)
-	beqz $t0, error
-	beq $s1, $t0, print_values
-	
+	lw $t0, 0($s3)
+	beqz $t0, ret_null
+	beq $s1, $t0, ret_value
 	blt $s1, $t0, search_left
 	bgt $s1, $t0, search_right
 	
 	jr $ra
 	
+ret_null:
+	lw $s0, 0($sp)
+	lw $s3, 4($sp)
+	lw $ra, 8($sp) 
+	addi $sp, $sp, 12
+	jr $ra
+	
 search_left:
-	lw $s0, 4($s0)
-	bnez  $s0, l3
-	lw $s0, 0($sp)	
+	lw $s0, 4($s0)	# root->left
+	addi $s3, $s0, 0 
+	bnez  $s0, l3 #se root->left = 0
+	lw $s0, 0($sp) 
+	addi $s3, $s0, 4
 l3:	
-	j search_rec
+	jal search_rec
+	lw $s0, 0($sp)
+	lw $s3, 4($sp)
+	lw $ra, 8($sp) 
+	addi $sp, $sp, 12
+	jr $ra
 	
 	
 search_right:
-	lw $s0, 8($s0)
-	bnez  $s0, l4
-	lw $s0, 0($sp)
+	lw $s0, 8($s0)	# root->left
+	addi $s3, $s0, 0 
+	bnez  $s0, l4 #se root->left = 0
+	lw $s0, 0($sp) 
+	addi $s3, $s0, 8
 l4:	
-	j search_rec
-	
-
-	
-error:
+	jal search_rec
+	lw $s0, 0($sp)
+	lw $s3, 4($sp)
+	lw $ra, 8($sp) 
+	addi $sp, $sp, 12
 	jr $ra
 
-print_values:
+ret_value:
 	li $v0, 4
 	la $a0, value_text
 	syscall
@@ -198,7 +217,8 @@ print_values:
 
 ############################################### SIZE_REC ###################################################
 tree_size:
-	addi $s7, $zero, 0
+	addi $s7, $zero, 0 #node amount
+	la $s0, ($s5)
 	addi $s3, $s0, 0
 	addi $fp, $sp, -12
 tree_rec:
